@@ -71,7 +71,7 @@ def make_reservations(tables, reservation_file):
     header = ['table_number', 'name', 'party_size', 'date', 'start_time', 'end_time']
     try:
         # open the reservations file in append mode
-        with open(reservation_file, mode='a', newline='') as file:
+        with open(reservation_file, 'a', newline='') as file:
             writer = csv.writer(file) #Create a CSV writer object
             # create/write header if not present
             if not header:
@@ -84,10 +84,28 @@ def make_reservations(tables, reservation_file):
         print(f"Table {table_number} reserved successfully for {name} on {date} from {start_time} to {end_time}.")
     except Exception as e:
         # Print an error message if something goes wrong
-        print(f"Error saving reservation: {e}")
+        print(f"Error making reservation: {e}")
         pass
 
-#Cacel reservation
+
+# View reservations
+def view_reservations(reservation_file):
+    try:
+        with open(reservation_file, 'r') as file:
+            reader = csv.reader(file)
+            reservations = list(reader)
+            print(reservations)
+            if reservations:
+                for i in reservations:
+                    print(i)
+            else:
+                ('No reservations found')
+            pass
+    except Exception as e:
+        print(f"Error reading reservations: {e}")
+        pass
+
+#Cancel reservation
 def cancel_reservation(reservation_file):
     name = input("Enter your name: ")
     reserved_date = input("Enter the date of reservation (YYYY-MM-DD): ")
@@ -114,7 +132,7 @@ def cancel_reservation(reservation_file):
 def daily_summary(reservation_file):
     date = input("Enter date of reservation: ")
     try:
-        with open(reservation_file) as file:
+        with open(reservation_file, 'r') as file:
             reader = csv.reader(file)
             header = next(reader)
             reservations = list(reader)
@@ -128,52 +146,46 @@ def daily_summary(reservation_file):
         print('Invalid date')
         pass
 
-# View reservations
-def view_reservations(reservation_file):
-    try:
-        with open(reservation_file, 'r') as file:
-            reader = csv.reader(file)
-            reservations = list(reader)
-            for i in reservations:
-                print(i)
-    except Exception as e:
-        print(f"Error reading reservations: {e}")
-        pass
-
 
 #modify reservation
 def modify_reservation(reservation_file):
-    date = input("Enter current reservation date (YYYY-MM-DD) ")
+    date = input("Enter current reservation date (YYYY-MM-DD): ")
     name = input("Enter your current reservation name: ")
     # table_number = int(input("Enter table number to modify: "))
-    with open(reservation_file, mode = 'r', newline='') as file:
+    with open(reservation_file, mode='r', newline='') as file:
         reader = csv.reader(file)
         header = next(reader)
         reservations = list(reader)
         # print(header)
 
+    reservation_found = False
     for reservation in reservations:
         if reservation[header.index("date")] == date and reservation[header.index("Name")] == name: #and reservation[header.index("Table Number")] == table_number
+            reservation_found = True
             print("Current reservation details: ", reservation)
 
             # update the inputs
             new_name = input(f"Enter new name (leave blank to keep current value '{reservation[header.index('name')]}'): ")
-            if new_name: reservation[header.index('name')] = new_name
+            if new_name: 
+                reservation[header.index('name')] = new_name
 
             new_date = input(f"Enter new date (leave blank to keep current value '{reservation[header.index('date')]}'): ")
-            if new_date : reservation[header.index('date')] = new_date
+            if new_date: 
+                reservation[header.index('date')] = new_date
 
             # new_table_number = input(f"Enter new table number (leave blank to keep current value '{reservation[header.index('table_number')]}'): ")
-            # if new_table_number : reservation[header.index("table_number")] = new_table_number
-
+            # if new_table_number: 
+                # reservation[header.index("table_number")] = new_table_number
+        if reservation_found:
             # Write the updated reservations back to the CSV file 
             with open(reservation_file, 'w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(header)
                 writer.writerows(reservations)
-                print('Reservation updated successfully.')
-                return
-    print("No reservation found")
+            print('Reservation updated successfully.')
+        else:
+            print("No reservation found for these details")
+        return
 
 
 #Function for display
@@ -182,7 +194,7 @@ def display():
     while True:
         print('Reservation System')
         print('1. Make reservation')
-        print('2. View reservation')
+        print('2. View reservations')
         print('3. Cancel reservation')
         print('4. Modify reservation')
         print('5. Daily Summary')
