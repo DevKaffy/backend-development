@@ -29,8 +29,8 @@ def view_tables():
         print(table)
 view_tables()
 
-reservation_file = "reservations.csv"
 
+reservation_file = "reservations.csv"
 
 # Make reservations
 def make_reservations(tables, reservation_file):
